@@ -26,13 +26,13 @@ namespace LDustSim
         private bool _disposed = false;
 
         private static void SimulationKernel(
-            Index1D index,
-            ArrayView<Particle> currentParticles,
-            ArrayView<Particle> nextParticles,
-            float gravity,
-            float deltaTime,
-            int screenWidth,
-            int screenHeight)
+    Index1D index,
+    ArrayView<Particle> currentParticles,
+    ArrayView<Particle> nextParticles,
+    float gravity,
+    float deltaTime,
+    int screenWidth,
+    int screenHeight)
         {
             Particle p = currentParticles[index];
 
@@ -41,8 +41,6 @@ namespace LDustSim
                 nextParticles[index] = p;
                 return;
             }
-
-            // p.VY += gravity * deltaTime;
 
             for (int i = 0; i < currentParticles.Length; i++)
             {
@@ -54,11 +52,14 @@ namespace LDustSim
                 {
                     float dx = other.X - p.X;
                     float dy = other.Y - p.Y;
+
                     float distanceSq = (dx * dx) + (dy * dy) + 0.1f;
+                    float distance = MathF.Sqrt(distanceSq);
+
                     float force = (other.Mass * 10.0f) / distanceSq;
 
-                    p.VX += (dx / distanceSq) * force * deltaTime;
-                    p.VY += (dy / distanceSq) * force * deltaTime;
+                    p.VX += (dx / distance) * force * deltaTime;
+                    p.VY += (dy / distance) * force * deltaTime;
                 }
             }
 
@@ -88,26 +89,15 @@ namespace LDustSim
             Particle[] initialParticles = new Particle[_particleCount];
             Random rand = new Random();
 
-            for (int i = 0; i < _particleCount; i++)
-            {
-                initialParticles[i] = new Particle
-                {
-                    X = rand.Next(0, _screenWidth),
-                    Y = rand.Next(0, _screenHeight),
-                    VX = (float)(rand.NextDouble() * 40 - 20),
-                    VY = (float)(rand.NextDouble() * 40 - 20),
-                    Mass = 1.0f,
-                    IsMoveable = 1,
-                    IsGravNode = 0
-                };
-            }
+            float centerX = _screenWidth / 2f;
+            float centerY = _screenHeight / 2f;
 
             if (_particleCount > 0)
             {
                 initialParticles[0] = new Particle
                 {
-                    X = _screenWidth / 2f,
-                    Y = _screenHeight / 2f,
+                    X = centerX,
+                    Y = centerY,
                     VX = 0,
                     VY = 0,
                     Mass = 500000.0f,
@@ -116,8 +106,33 @@ namespace LDustSim
                 };
             }
 
-            _bufferA.CopyFromCPU(initialParticles);
+            for (int i = 1; i < _particleCount; i++)
+            {
+                float angle = (float)(rand.NextDouble() * 2.0 * Math.PI);
 
+                float radius = (float)(rand.NextDouble() * 220 + 60);
+
+                float x = centerX + radius * (float)Math.Cos(angle);
+                float y = centerY + radius * (float)Math.Sin(angle);
+
+                float orbitalSpeed = (float)Math.Sqrt(5000000.0f / radius);
+
+                float vx = orbitalSpeed * (float)Math.Sin(angle);
+                float vy = -orbitalSpeed * (float)Math.Cos(angle);
+
+                initialParticles[i] = new Particle
+                {
+                    X = x,
+                    Y = y,
+                    VX = vx,
+                    VY = vy,
+                    Mass = 1.0f,
+                    IsMoveable = 1,
+                    IsGravNode = 0
+                };
+            }
+
+            _bufferA.CopyFromCPU(initialParticles);
             _bufferB.CopyFromCPU(initialParticles);
         }
 
@@ -152,9 +167,26 @@ namespace LDustSim
 
                 foreach (var p in managedParticles)
                 {
-                    if (p.X >= 0 && p.X < _screenWidth && p.Y >= 0 && p.Y < _screenHeight)
+                    float radius = Math.Max(1.0f, (float)Math.Sqrt(p.Mass) * 0.05f);
+
+                    if (p.X >= -radius && p.X < _screenWidth && p.Y >= -radius && p.Y < _screenHeight)
                     {
-                        Raylib.DrawPixel((int)p.X, (int)p.Y, Color.White);
+                        float speed = (float)Math.Sqrt((p.VX * p.VX) + (p.VY * p.VY));
+
+                        float maxSpeed = 300f;
+                        float normalizedSpeed = Math.Clamp(speed / maxSpeed, 0f, 1f);
+
+                        byte r = (byte)(normalizedSpeed * 255);
+                        byte g = 0;
+                        byte b = (byte)((1.0f - normalizedSpeed) * 255);
+                        Color particleColor = new Color(r, g, b, (byte)255);
+
+                        if (p.IsGravNode == 1)
+                        {
+                            particleColor = Color.Yellow;
+                        }
+
+                        Raylib.DrawCircle((int)p.X, (int)p.Y, radius, particleColor);
                     }
                 }
 
