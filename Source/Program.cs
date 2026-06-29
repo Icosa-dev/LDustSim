@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+// TODO: Document all of the code
+
 namespace LDustSim
 {
     public class Program

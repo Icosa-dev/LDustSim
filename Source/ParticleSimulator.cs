@@ -23,6 +23,7 @@ namespace LDustSim
         private readonly int _screenWidth = 800;
         private readonly int _screenHeight = 600;
         private readonly int _particleCount;
+        private float _elapsedTime = 0.0f;
         private bool _disposed = false;
 
         private Particle _p1;
@@ -76,7 +77,7 @@ namespace LDustSim
             _particleCount = particleCount;
 
             Raylib.InitWindow(_screenWidth, _screenHeight, "LDustSim");
-            Raylib.SetTargetFPS(60);
+            Raylib.SetTargetFPS(120);
 
             _context = Context.Create(builder => builder.Cuda());
             _accelerator = _context.CreateCudaAccelerator(0);
@@ -147,6 +148,8 @@ namespace LDustSim
                 float deltaTime = Raylib.GetFrameTime();
                 float gravity = 9.81f;
 
+                _elapsedTime += deltaTime;
+
                 var inputBuffer = isBufferAInput ? _bufferA : _bufferB;
                 var outputBuffer = isBufferAInput ? _bufferB : _bufferA;
 
@@ -201,6 +204,7 @@ namespace LDustSim
                 Raylib.DrawText("Particle Count: " + _particleCount, 10, 30, 10, Color.Green);
                 Raylib.DrawText("P1 Position: (" + _p1.X + ", " + _p1.Y + ")", 10, 40, 10, Color.Green);
                 Raylib.DrawText("P1 Velocity: (" + _p1.VX + ", " + _p1.VY + ")", 10, 50, 10, Color.Green);
+                Raylib.DrawText("Time Elapsed: " + _elapsedTime + "s", 10, 60, 10, Color.Green);
                 Raylib.EndDrawing();
 
                 isBufferAInput = !isBufferAInput;
