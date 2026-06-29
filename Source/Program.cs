@@ -10,7 +10,7 @@ namespace LDustSim
     {
         public static void Main(string[] args)
         {
-            ParticleSimulator simulator = new ParticleSimulator(1024);
+            ParticleSimulator simulator = new ParticleSimulator(16_384);
             simulator.Run();
         }
     }
