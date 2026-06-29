@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-using System;
 using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
