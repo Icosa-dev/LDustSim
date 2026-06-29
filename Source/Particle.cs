@@ -12,8 +12,8 @@ namespace LDustSim
         public float X, Y;
         public float VX, VY;
         public float Mass;
-        public bool isGravNode;
-        public bool isMoveable;
+        public byte IsGravNode;
+        public byte IsMoveable;
 
         // Rendering Attributes
         public float Size;
