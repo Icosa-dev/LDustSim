@@ -25,6 +25,8 @@ namespace LDustSim
         private readonly int _particleCount;
         private bool _disposed = false;
 
+        private Particle _p1;
+
         private static void SimulationKernel(
     Index1D index,
     ArrayView<Particle> currentParticles,
@@ -162,6 +164,11 @@ namespace LDustSim
 
                 Particle[] managedParticles = outputBuffer.GetAsArray1D();
 
+                if (managedParticles.Length > 1)
+                {
+                    _p1 = managedParticles[1];
+                }
+
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.Black);
 
@@ -191,6 +198,9 @@ namespace LDustSim
                 }
 
                 Raylib.DrawFPS(10, 10);
+                Raylib.DrawText("Particle Count: " + _particleCount, 10, 30, 10, Color.Green);
+                Raylib.DrawText("P1 Position: (" + _p1.X + ", " + _p1.Y + ")", 10, 40, 10, Color.Green);
+                Raylib.DrawText("P1 Velocity: (" + _p1.VX + ", " + _p1.VY + ")", 10, 50, 10, Color.Green);
                 Raylib.EndDrawing();
 
                 isBufferAInput = !isBufferAInput;
