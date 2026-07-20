@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+#pragma once
+
 class ParticleSimulator {
 private:
     const int _screenWidth = 720;

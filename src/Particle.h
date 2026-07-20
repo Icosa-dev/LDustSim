@@ -4,12 +4,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <cstddef>
+#pragma once
+
+#include <cstdint>
 
 struct Particle {
     float x, y;
     float vx, vy;
     float mass;
-    std::byte isGravNode;
-    std::byte isMoveable;
+    uint8_t isGravNode;
+    uint8_t isMoveable;
 };
