@@ -6,6 +6,7 @@
 
 #include "ParticleSimulator.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <random>
@@ -17,7 +18,7 @@
 
 ParticleSimulator::ParticleSimulator(int particleCount)
     : _particleCount(particleCount) {
-    InitWindow(_screenHeight, _screenHeight, "LDustSim");
+    InitWindow(_screenWidth, _screenHeight, "LDustSim");
     SetTargetFPS(120);
 
     cudaMallocManaged((void **)&_bufferA, _particleCount * sizeof(Particle));
@@ -104,7 +105,19 @@ void ParticleSimulator::run() {
         ClearBackground(BLACK);
 
         for (size_t i = 0; i < _particleCount; ++i) {
-            DrawPixel(outputBuffer[i].x, outputBuffer[i].y, WHITE);
+            const Particle &p = outputBuffer[i];
+
+            float speed = std::hypot(p.vx, p.vy);
+            float normalizedSpeed = std::clamp(speed / _maxSpeed, 0.0f, 1.0f);
+
+            Color color = {
+                .r = static_cast<unsigned char>(normalizedSpeed * 255),
+                .g = 0,
+                .b = static_cast<unsigned char>((1.0f - normalizedSpeed) * 255),
+                .a = 255
+            };
+            
+            DrawPixel(p.x, p.y, color);
         }
 
         DrawFPS(10, 10);

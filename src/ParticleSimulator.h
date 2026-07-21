@@ -18,6 +18,7 @@ private:
     float _gravity = 9.81f;
     float _elapsedTime = 0.0f;
     // Particle *_p1;
+    float _maxSpeed = 300.0f;
 
     // Raylib variables
     const int _screenWidth = 720;
