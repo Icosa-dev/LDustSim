@@ -1,3 +1,3 @@
 # LDustSim
 
-LDustSim is a GPU-Accelerated N-Body gravitational particle simulation.
+LDustSim is a CUDA GPU-Accelerated N-Body gravitational particle simulation.
