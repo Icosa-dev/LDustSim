@@ -8,5 +8,5 @@
 
 struct Particle;
 
-void launchSimulationKernel(Particle *currentParticles, Particle *nextParticles,
+void launchSimulationKernel(const Particle *currentParticles, Particle *nextParticles,
                             int numParticles, float gravity, float deltaTime);
