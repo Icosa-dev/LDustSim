@@ -23,8 +23,6 @@ __global__ void simulationKernel(const Particle *currentParticles,
 
     Particle p = currentParticles[index];
 
-    // TODO: Move all immovable particles to the start of the
-    // buffer, so this check is one-and-done
     if (p.isMoveable == 0) {
         nextParticles[index] = p;
         return;
