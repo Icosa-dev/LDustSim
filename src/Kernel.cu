@@ -13,7 +13,7 @@
 #include "Particle.h"
 #include "ParticleSimulator.h"
 
-__global__ void simulationKernel(Particle *currentParticles,
+__global__ void simulationKernel(const Particle *currentParticles,
                                  Particle *nextParticles, int numParticles,
                                  float gravity, float deltaTime) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -56,7 +56,7 @@ __global__ void simulationKernel(Particle *currentParticles,
     nextParticles[index] = p;
 }
 
-void launchSimulationKernel(Particle *currentParticles, Particle *nextParticles,
+void launchSimulationKernel(const Particle *currentParticles, Particle *nextParticles,
                             int numParticles, float gravity, float deltaTime) {
     int threadsPerBlock = 256;
     int blocksPerGrid = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
