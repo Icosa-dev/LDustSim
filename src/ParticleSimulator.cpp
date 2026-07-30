@@ -17,12 +17,15 @@
 
 ParticleSimulator::ParticleSimulator(int particleCount)
     : _particleCount(particleCount) {
+    // Raylib initialization
     InitWindow(_screenWidth, _screenHeight, "LDustSim");
     SetTargetFPS(120);
 
+    // Allocate GPU memory for particle buffers
     cudaMallocManaged((void **)&_bufferA, _particleCount * sizeof(Particle));
     cudaMallocManaged((void **)&_bufferB, _particleCount * sizeof(Particle));
 
+    // Allocate GPU memory for pixel buffer
     cudaMallocManaged((void **)&_cudaPixels,
                       _screenWidth * _screenHeight * sizeof(Color));
     Image screenImage = {.data = _cudaPixels,
@@ -32,10 +35,10 @@ ParticleSimulator::ParticleSimulator(int particleCount)
                          .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
     _screenTexture = LoadTextureFromImage(screenImage);
 
+    // Create central GravNode
     float centerX = static_cast<float>(_screenWidth) / 2.0f;
     float centerY = static_cast<float>(_screenHeight) / 2.0f;
 
-    // Create central GravNode
     if (_particleCount > 0) {
         _bufferA[0] = Particle{.x = centerX,
                                .y = centerY,
@@ -46,6 +49,7 @@ ParticleSimulator::ParticleSimulator(int particleCount)
                                .isMoveable = 0};
     }
 
+    // Generate ring of particles around central GravNode
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distAngle(0.0f, 2.0f * M_PI);
