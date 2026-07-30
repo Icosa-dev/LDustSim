@@ -11,6 +11,7 @@
 #include <cuda_runtime_api.h>
 #include <random>
 #include <raylib.h>
+#include <sstream>
 
 #include "Kernel.h"
 #include "Particle.h"
@@ -105,7 +106,7 @@ void ParticleSimulator::run() {
 
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
-        _elapsedTime += deltaTime;
+        _timeElapsed += deltaTime;
 
         Particle *inputBuffer = isBufferAInput ? _bufferA : _bufferB;
         Particle *outputBuffer = isBufferAInput ? _bufferB : _bufferA;
@@ -124,11 +125,17 @@ void ParticleSimulator::run() {
         UpdateTexture(_screenTexture, _cudaPixels);
 
         BeginDrawing();
+        {
+            ClearBackground(BLACK);
+            
+            DrawTexture(_screenTexture, 0, 0, WHITE);
 
-        ClearBackground(BLACK);
-        DrawTexture(_screenTexture, 0, 0, WHITE);
-        DrawFPS(10, 10);
+            DrawFPS(10, 10);
 
+            std::ostringstream ss;
+            ss << "Time Elapsed: " << _timeElapsed;
+            DrawText(ss.str().c_str(), 10, 30, 10, GREEN);
+        }
         EndDrawing();
 
         isBufferAInput = !isBufferAInput;
