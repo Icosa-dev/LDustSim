@@ -6,15 +6,14 @@
 
 #include "ParticleSimulator.h"
 
-#include <algorithm>
 #include <cmath>
 #include <cstdlib>
-#include <random>
 #include <cuda_runtime_api.h>
+#include <random>
 #include <raylib.h>
 
+#include "Kernel.h"
 #include "Particle.h"
-#include "SimulationKernel.h"
 
 ParticleSimulator::ParticleSimulator(int particleCount)
     : _particleCount(particleCount) {
@@ -24,27 +23,33 @@ ParticleSimulator::ParticleSimulator(int particleCount)
     cudaMallocManaged((void **)&_bufferA, _particleCount * sizeof(Particle));
     cudaMallocManaged((void **)&_bufferB, _particleCount * sizeof(Particle));
 
+    cudaMallocManaged((void **)&_cudaPixels,
+                      _screenWidth * _screenHeight * sizeof(Color));
+    Image screenImage = {.data = _cudaPixels,
+                         .width = _screenWidth,
+                         .height = _screenHeight,
+                         .mipmaps = 1,
+                         .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
+    _screenTexture = LoadTextureFromImage(screenImage);
+
     float centerX = static_cast<float>(_screenWidth) / 2.0f;
     float centerY = static_cast<float>(_screenHeight) / 2.0f;
 
     // Create central GravNode
     if (_particleCount > 0) {
-        _bufferA[0] = Particle{
-            .x = centerX,
-            .y = centerY,
-            .vx = 0.0f,
-            .vy = 0.0f,
-            .mass = 500000.0f,
-            .isGravNode = 1,
-            .isMoveable = 0 
-        };
+        _bufferA[0] = Particle{.x = centerX,
+                               .y = centerY,
+                               .vx = 0.0f,
+                               .vy = 0.0f,
+                               .mass = 500000.0f,
+                               .isGravNode = 1,
+                               .isMoveable = 0};
     }
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distAngle(0.0f, 2.0f * M_PI);
-    std::uniform_real_distribution<float> distRadius(
-        60.0f, 280.0f);
+    std::uniform_real_distribution<float> distRadius(60.0f, 280.0f);
 
     for (int i = 1; i < _particleCount; ++i) {
         float angle = distAngle(gen);
@@ -58,15 +63,13 @@ ParticleSimulator::ParticleSimulator(int particleCount)
         float vx = orbitalSpeed * std::sin(angle);
         float vy = -orbitalSpeed * std::cos(angle);
 
-        _bufferA[i] = Particle{
-            .x = x,
-            .y = y,
-            .vx = vx,
-            .vy = vy,
-            .mass = 1.0f,
-            .isGravNode = 0,
-            .isMoveable = 1
-        };
+        _bufferA[i] = Particle{.x = x,
+                               .y = y,
+                               .vx = vx,
+                               .vy = vy,
+                               .mass = 1.0f,
+                               .isGravNode = 0,
+                               .isMoveable = 1};
     }
 
     // Duplicate initial state into buffer B
@@ -76,10 +79,17 @@ ParticleSimulator::ParticleSimulator(int particleCount)
 }
 
 ParticleSimulator::~ParticleSimulator() {
-    if (_bufferA)
+    if (_bufferA) {
         cudaFree(_bufferA);
-    if (_bufferB)
+    }
+    if (_bufferB) {
         cudaFree(_bufferB);
+    }
+
+    UnloadTexture(_screenTexture);
+    if (_cudaPixels) {
+        cudaFree(_cudaPixels);
+    }
 
     if (IsWindowReady()) {
         CloseWindow();
@@ -99,28 +109,22 @@ void ParticleSimulator::run() {
         launchSimulationKernel(inputBuffer, outputBuffer, _particleCount,
                                _gravity, deltaTime);
 
+        cudaMemset(_cudaPixels, 0,
+                   _screenWidth * _screenHeight * sizeof(Color));
+
+        launchRenderParticlesKernel(outputBuffer, _particleCount, _cudaPixels,
+                                    _screenWidth, _screenHeight, _maxSpeed);
+
         cudaDeviceSynchronize();
 
+        UpdateTexture(_screenTexture, _cudaPixels);
+
         BeginDrawing();
+
         ClearBackground(BLACK);
-
-        for (size_t i = 0; i < _particleCount; ++i) {
-            const Particle &p = outputBuffer[i];
-
-            float speed = std::hypot(p.vx, p.vy);
-            float normalizedSpeed = std::clamp(speed / _maxSpeed, 0.0f, 1.0f);
-
-            Color color = {
-                .r = static_cast<unsigned char>(normalizedSpeed * 255),
-                .g = 0,
-                .b = static_cast<unsigned char>((1.0f - normalizedSpeed) * 255),
-                .a = 255
-            };
-            
-            DrawPixel(p.x, p.y, color);
-        }
-
+        DrawTexture(_screenTexture, 0, 0, WHITE);
         DrawFPS(10, 10);
+
         EndDrawing();
 
         isBufferAInput = !isBufferAInput;

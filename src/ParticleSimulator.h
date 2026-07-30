@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <raylib.h>
+
 struct Particle;
 
 class ParticleSimulator {
@@ -23,6 +25,11 @@ private:
     // Raylib variables
     const int _screenWidth = 720;
     const int _screenHeight = 900;
+
+    // GPU rendering fields
+    Color *_cudaPixels = nullptr;
+    Texture2D _screenTexture;
+
 public:
     ParticleSimulator(int particleCount);
     ~ParticleSimulator();
