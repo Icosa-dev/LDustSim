@@ -23,7 +23,7 @@ FetchContent_MakeAvailable(raylib)
 add_executable(${PROJECT_NAME} 
     src/Main.cpp
     src/ParticleSimulator.cpp
-    src/SimulationKernel.cu
+    src/Kernel.cu
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
