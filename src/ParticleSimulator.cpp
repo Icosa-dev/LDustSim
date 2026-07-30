@@ -6,7 +6,6 @@
 
 #include "ParticleSimulator.h"
 
-#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <cuda_runtime_api.h>
