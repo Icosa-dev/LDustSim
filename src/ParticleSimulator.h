@@ -10,6 +10,9 @@
 
 struct Particle;
 
+/**
+ * @brief Simulates and renders a simulation of particles
+ */
 class ParticleSimulator {
 private:
     // Simulation buffers
@@ -31,8 +34,20 @@ private:
     Texture2D _screenTexture;
 
 public:
+    /**
+     * @brief Construct a new Particle Simulator object
+     * 
+     * @param particleCount The number of particles to simulate
+     */
     ParticleSimulator(int particleCount);
+
+    /**
+     * @brief Destroy the Particle Simulator object
+     */
     ~ParticleSimulator();
 
+    /**
+     * @brief Run a simulation
+     */
     void run();
 };
