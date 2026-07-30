@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2026 LJC
  *
  * SPDX-License-Identifier: MIT
@@ -21,7 +21,7 @@ private:
     // Simulation variables
     const int _particleCount;
     float _gravity = 9.81f;
-    float _elapsedTime = 0.0f;
+    float _timeElapsed = 0.0f;
     // Particle *_p1;
     float _maxSpeed = 300.0f;
 
@@ -36,7 +36,7 @@ private:
 public:
     /**
      * @brief Construct a new Particle Simulator object
-     * 
+     *
      * @param particleCount The number of particles to simulate
      */
     ParticleSimulator(int particleCount);
