@@ -14,11 +14,17 @@ FetchContent_Declare(
     raylib
     URL https://github.com/raysan5/raylib/archive/refs/tags/6.0.tar.gz
 )
+FetchContent_MakeAvailable(raylib)
+
+FetchContent_Declare(
+    luabridge3
+    GIT_REPOSITORY https://github.com/kunitoki/LuaBridge3.git
+    GIT_TAG        master
+)
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(raylib)
 
 add_executable(${PROJECT_NAME} 
     src/Main.cpp
@@ -29,8 +35,10 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     raylib
 )
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
     src
+    ${luabridge3_SOURCE_DIR}/Source
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
