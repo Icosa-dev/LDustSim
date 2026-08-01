@@ -17,10 +17,18 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 
 FetchContent_Declare(
+    lua
+    GIT_REPOSITORY https://github.com/walterschell/Lua.git
+    GIT_TAG        master 
+)
+FetchContent_MakeAvailable(lua)
+
+FetchContent_Declare(
     luabridge3
     GIT_REPOSITORY https://github.com/kunitoki/LuaBridge3.git
     GIT_TAG        master
 )
+FetchContent_MakeAvailable(luabridge3)
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
@@ -34,6 +42,7 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     raylib
+    lua
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
