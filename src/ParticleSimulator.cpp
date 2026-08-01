@@ -15,8 +15,13 @@
 #include "Kernel.h"
 #include "Particle.h"
 
-ParticleSimulator::ParticleSimulator(int particleCount)
-    : _particleCount(particleCount) {
+ParticleSimulator::ParticleSimulator(Particle *particles, int particleCount,
+                                     float gravity, float maxSpeed,
+                                     int screenWidth, int screenHeight,
+                                     int targetFPS, bool showDebugInfo)
+    : _particleCount(particleCount), _gravity(gravity), _maxSpeed(maxSpeed),
+      _screenWidth(screenWidth), _screenHeight(screenHeight),
+      _targetFPS(targetFPS), _showDebugInfo(showDebugInfo) {
     // Raylib initialization
     InitWindow(_screenWidth, _screenHeight, "LDustSim");
     SetTargetFPS(120);
@@ -124,11 +129,14 @@ void ParticleSimulator::run() {
         UpdateTexture(_screenTexture, _cudaPixels);
 
         BeginDrawing();
+        {
+            ClearBackground(BLACK);
+            DrawTexture(_screenTexture, 0, 0, WHITE);
 
-        ClearBackground(BLACK);
-        DrawTexture(_screenTexture, 0, 0, WHITE);
-        DrawFPS(10, 10);
-
+            if (_showDebugInfo) {
+                DrawFPS(10, 10);
+            }
+        }
         EndDrawing();
 
         isBufferAInput = !isBufferAInput;
