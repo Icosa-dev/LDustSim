@@ -4,8 +4,12 @@
  * SPDX-License-Identifier: MIT
  */
 
+#define VERISON "INDEV"
+
 #include <iostream>
 #include <vector>
+#include <argparse/argparse.hpp>
+
 extern "C" {
 #include <lauxlib.h>
 #include <lua.h>
@@ -26,6 +30,24 @@ extern "C" {
     GET_SIM_FIELD(luastate, key, target, getter)
 
 int main(int argc, char **argv) {
+    // Argparsing
+    argparse::ArgumentParser program("LDustSim", VERISON);
+
+    program.add_argument("configuration-script")
+        .help("Path to a .lua file to define the nature of the simulation")
+        .default_value(std::string("src/lua/DefaultSimulation.lua"))
+        .nargs(0, 1);
+
+    try {
+        program.parse_args(argc, argv);
+    } catch (const std::exception &err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << program;
+        std::exit(1);
+    }
+
+    std::string config_file = program.get<std::string>("configuration-script");
+
     // Simulation config values
     double gravity, maxSpeed;
     int targetFPS, screenWidth, screenHeight, particleCount;
@@ -46,8 +68,7 @@ int main(int argc, char **argv) {
     // Set "simulation" table global
     lua_setglobal(L, "simulation");
 
-    // Load lua script
-    if (luaL_dofile(L, argv[1]) != LUA_OK) {
+    if (luaL_dofile(L, config_file.c_str()) != LUA_OK) {
         std::cerr << "Error loading Lua script: " << lua_tostring(L, -1)
                   << std::endl;
         lua_pop(L, 1);
@@ -94,6 +115,7 @@ int main(int argc, char **argv) {
 
     lua_close(L);
 
+    // Initializing simulation
     ParticleSimulator simulator =
         ParticleSimulator(particles.data(), particleCount, gravity, maxSpeed,
                           screenWidth, screenHeight, targetFPS, showDebugInfo);
