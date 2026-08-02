@@ -11,6 +11,7 @@
 #include <cuda_runtime_api.h>
 #include <random>
 #include <raylib.h>
+#include <sstream>
 
 #include "Kernel.h"
 #include "Particle.h"
@@ -110,7 +111,7 @@ void ParticleSimulator::run() {
 
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
-        _elapsedTime += deltaTime;
+        _timeElapsed += deltaTime;
 
         Particle *inputBuffer = isBufferAInput ? _bufferA : _bufferB;
         Particle *outputBuffer = isBufferAInput ? _bufferB : _bufferA;
