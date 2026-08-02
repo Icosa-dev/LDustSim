@@ -20,7 +20,7 @@ Simulations can be customized via lua scripts. The path to the configuring
 lua script can be passed as the first argument to the program. The following
 are the variables which can be customized. Note that all must be set to a value
 otherwise the program will throw an error. The preset simulation scripts are
-located in `LDustSim/src/Scripts.h" as macros.
+located in `LDustSim/src/Scripts.h` as macros.
 
 - `simulation.gravity`: Gravitational constant for the simulation (float)
 - `simulation.maxSpeed`: Max speed for any given particle (float)
