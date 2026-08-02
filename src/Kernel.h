@@ -14,19 +14,21 @@ struct Particle;
  * @brief Launch a kernel for gravitational simulation of particles on
  * the GPU
  *
+ * @param threadsPerBlcok The number of threads per block that the kernel will use
  * @param currentParticles Particle buffer to base calculations on
  * @param nextParticles Output buffer for post-calculation particles
  * @param numParticles Number of particles
  * @param gravity Amount of gravity to simulate
  * @param deltaTime Delta time
  */
-void launchSimulationKernel(const Particle *currentParticles,
+void launchSimulationKernel(int threadsPerBlco , const Particle *currentParticles,
                             Particle *nextParticles, int numParticles,
                             float gravity, float deltaTime);
 
 /**
  * @brief  Launch a kernel for rendering of particles on the GPU
  *
+ * @param threadsPerBlock The number of threads per block that the kernel will use
  * @param particles Particles to render
  * @param numParticles Number of particles
  * @param pixels Pixel buffer to draw on
@@ -35,6 +37,6 @@ void launchSimulationKernel(const Particle *currentParticles,
  * @param maxSpeed Max speed of the particles for calculating color based
  * on velocity
  */
-void launchRenderParticlesKernel(const Particle *particles, int numParticles,
-                                 Color *pixels, int width, int height,
-                                 float maxSpeed);
+void launchRenderParticlesKernel(int threads, const Particle *particles,
+                                 int numParticles, Color *pixels, int width,
+                                 int height, float maxSpeed);

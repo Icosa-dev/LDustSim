@@ -19,10 +19,14 @@
 ParticleSimulator::ParticleSimulator(Particle *particles, int particleCount,
                                      float gravity, float maxSpeed,
                                      int screenWidth, int screenHeight,
-                                     int targetFPS, bool showDebugInfo)
+                                     int targetFPS, bool showDebugInfo,
+                                     int simulationThreadsPerBlock,
+                                     int rendererThreadsPerBlock)
     : _particleCount(particleCount), _gravity(gravity), _maxSpeed(maxSpeed),
       _screenWidth(screenWidth), _screenHeight(screenHeight),
-      _targetFPS(targetFPS), _showDebugInfo(showDebugInfo) {
+      _targetFPS(targetFPS), _showDebugInfo(showDebugInfo),
+      _simulationThreadsPerBlock(simulationThreadsPerBlock),
+      _rendererThreadsPerBlock(rendererThreadsPerBlock) {
     // Raylib initialization
     InitWindow(_screenWidth, _screenHeight, "LDustSim");
     SetTargetFPS(120);
@@ -116,14 +120,16 @@ void ParticleSimulator::run() {
         Particle *inputBuffer = isBufferAInput ? _bufferA : _bufferB;
         Particle *outputBuffer = isBufferAInput ? _bufferB : _bufferA;
 
-        launchSimulationKernel(inputBuffer, outputBuffer, _particleCount,
-                               _gravity, deltaTime);
+        launchSimulationKernel(_simulationThreadsPerBlock, inputBuffer,
+                               outputBuffer, _particleCount, _gravity,
+                               deltaTime);
 
         cudaMemset(_cudaPixels, 0,
                    _screenWidth * _screenHeight * sizeof(Color));
 
-        launchRenderParticlesKernel(outputBuffer, _particleCount, _cudaPixels,
-                                    _screenWidth, _screenHeight, _maxSpeed);
+        launchRenderParticlesKernel(_rendererThreadsPerBlock, outputBuffer,
+                                    _particleCount, _cudaPixels, _screenWidth,
+                                    _screenHeight, _maxSpeed);
 
         cudaDeviceSynchronize();
 

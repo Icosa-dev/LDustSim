@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2026 LJC
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+// I could not just us a lua file so the default lua script is
+// just a macro in a header file
+// :P
+
+#define DEFAULT_SIMULATION                                                     \
+    R"(
 simulation.gravity = 9.81
 simulation.maxSpeed = 300.0
 simulation.screenWidth = 720
@@ -5,6 +17,8 @@ simulation.screenHeight = 900
 simulation.targetFPS = 120
 simulation.showDebugInfo = true
 simulation.particleCount = 16384
+simulation.threadsPerBlock = 256
+simulation.rendererThreadsPerBlock = 256
 
 local centerX = simulation.screenWidth / 2
 local centerY = simulation.screenHeight / 2
@@ -47,3 +61,4 @@ for i = 2, simulation.particleCount do
         isMoveable = 1
     }
 end
+)"

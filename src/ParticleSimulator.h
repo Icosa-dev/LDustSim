@@ -21,8 +21,9 @@ private:
     // Simulation variables
     const int _particleCount;
     const float _gravity;
-    float _elapsedTime = 0.0f;
+    float _timeElapsed = 0.0f;
     const float _maxSpeed;
+    const int _simulationThreadsPerBlock;
 
     // Raylib variables
     const int _screenWidth;
@@ -33,6 +34,7 @@ private:
     // GPU rendering fields
     Color *_cudaPixels = nullptr;
     Texture2D _screenTexture;
+    const int _rendererThreadsPerBlock;
 
 public:
     /**
@@ -46,10 +48,12 @@ public:
      * @param screenHeight Simulation screen height
      * @param targetFPS Target FPS for the simulation
      * @param showDebugInfo Simulation will display debug info if true
+     * @param simulationThreadsPerBlock Number of threads the simulation kernel will use
+     * @param rendererThreadsPerBlock Number of threads the renderer kernel will use
      */
     ParticleSimulator(Particle *particles, int particleCount, float gravity,
                       float maxSpeed, int screenWidth, int screenHeight,
-                      int targetFPS, bool showDebugInfo);
+                      int targetFPS, bool showDebugInfo, int simulationThreadsPerBlock, int rendererThreadsPerBlock);
 
     /**
      * @brief Destroy the Particle Simulator object
