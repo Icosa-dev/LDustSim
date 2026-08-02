@@ -16,9 +16,9 @@ extern "C" {
 #include <lualib.h>
 }
 
-#include "DefaultSimulation.h"
 #include "Particle.h"
 #include "ParticleSimulator.h"
+#include "Scripts.h"
 
 #define GET_SIM_FIELD(luastate, name, target, getter)                          \
     do {                                                                       \

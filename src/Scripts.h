@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-// I could not just us a lua file so the default lua script is
-// just a macro in a header file
+// I could not just us a lua file so the preset lua scripts are
+// just macros in a header file
 // :P
 
 #define DEFAULT_SIMULATION                                                     \
