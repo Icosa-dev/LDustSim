@@ -21,7 +21,7 @@ private:
     // Simulation variables
     const int _particleCount;
     const float _gravity;
-    float _elapsedTime = 0.0f;
+    float _timeElapsed = 0.0f;
     const float _maxSpeed;
     const int _simulationThreadsPerBlock;
 
