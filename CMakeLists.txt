@@ -14,11 +14,23 @@ FetchContent_Declare(
     raylib
     URL https://github.com/raysan5/raylib/archive/refs/tags/6.0.tar.gz
 )
+FetchContent_MakeAvailable(raylib)
+
+FetchContent_Declare(
+    lua
+    GIT_REPOSITORY https://github.com/walterschell/Lua.git
+    GIT_TAG        master 
+)
+FetchContent_MakeAvailable(lua)
+
+FetchContent_Declare(
+    argparse
+    GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+)
+FetchContent_MakeAvailable(argparse)
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(raylib)
 
 add_executable(${PROJECT_NAME} 
     src/Main.cpp
@@ -28,9 +40,14 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     raylib
+    lua_static
+    argparse
 )
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
     src
+    ${lua_SOURCE_DIR}
+    ${lua_SOURCE_DIR}/src
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

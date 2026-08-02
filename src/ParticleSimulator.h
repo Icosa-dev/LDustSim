@@ -20,14 +20,15 @@ private:
 
     // Simulation variables
     const int _particleCount;
-    float _gravity = 9.81f;
-    float _timeElapsed = 0.0f;
-    // Particle *_p1;
-    float _maxSpeed = 300.0f;
+    const float _gravity;
+    float _elapsedTime = 0.0f;
+    const float _maxSpeed;
 
     // Raylib variables
-    const int _screenWidth = 720;
-    const int _screenHeight = 900;
+    const int _screenWidth;
+    const int _screenHeight;
+    const int _targetFPS;
+    const bool _showDebugInfo;
 
     // GPU rendering fields
     Color *_cudaPixels = nullptr;
@@ -37,9 +38,18 @@ public:
     /**
      * @brief Construct a new Particle Simulator object
      *
-     * @param particleCount The number of particles to simulate
+     * @param particles Initial particle buffer
+     * @param particleCount Total number of particles
+     * @param gravity Gravitational constant
+     * @param maxSpeed Max speed a particle can reach
+     * @param screenWidth Simulation screen width
+     * @param screenHeight Simulation screen height
+     * @param targetFPS Target FPS for the simulation
+     * @param showDebugInfo Simulation will display debug info if true
      */
-    ParticleSimulator(int particleCount);
+    ParticleSimulator(Particle *particles, int particleCount, float gravity,
+                      float maxSpeed, int screenWidth, int screenHeight,
+                      int targetFPS, bool showDebugInfo);
 
     /**
      * @brief Destroy the Particle Simulator object
