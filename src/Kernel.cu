@@ -54,9 +54,8 @@ __global__ void simulationKernel(const Particle *currentParticles,
     nextParticles[index] = p;
 }
 
-void launchSimulationKernel(const Particle *currentParticles, Particle *nextParticles,
+void launchSimulationKernel(int threadsPerBlock, const Particle *currentParticles, Particle *nextParticles,
                             int numParticles, float gravity, float deltaTime) {
-    int threadsPerBlock = 256;
     int blocksPerGrid = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
 
     simulationKernel<<<blocksPerGrid, threadsPerBlock>>>(
@@ -89,10 +88,9 @@ __global__ void renderParticlesKernel(const Particle *particles,
     }
 }
 
-void launchRenderParticlesKernel(const Particle *particles, int numParticles,
+void launchRenderParticlesKernel(int threadsPerBlock, const Particle *particles, int numParticles,
                                  Color *pixels, int width, int height,
                                  float maxSpeed) {
-    int threadsPerBlock = 256;
     int blocksPerGrid = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
 
     renderParticlesKernel<<<blocksPerGrid, threadsPerBlock>>>(

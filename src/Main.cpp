@@ -6,9 +6,9 @@
 
 #define VERISON "INDEV"
 
+#include <argparse/argparse.hpp>
 #include <iostream>
 #include <vector>
-#include <argparse/argparse.hpp>
 
 extern "C" {
 #include <lauxlib.h>
@@ -16,6 +16,7 @@ extern "C" {
 #include <lualib.h>
 }
 
+#include "DefaultSimulation.h"
 #include "Particle.h"
 #include "ParticleSimulator.h"
 
@@ -35,7 +36,7 @@ int main(int argc, char **argv) {
 
     program.add_argument("configuration-script")
         .help("Path to a .lua file to define the nature of the simulation")
-        .default_value(std::string("src/lua/DefaultSimulation.lua"))
+        .default_value(std::string(""))
         .nargs(0, 1);
 
     try {
@@ -50,7 +51,8 @@ int main(int argc, char **argv) {
 
     // Simulation config values
     double gravity, maxSpeed;
-    int targetFPS, screenWidth, screenHeight, particleCount;
+    int targetFPS, screenWidth, screenHeight, particleCount,
+        simulationThreadsPerBlock, rendererThreadsPerBlock;
     bool showDebugInfo;
     std::vector<Particle> particles;
 
@@ -68,12 +70,20 @@ int main(int argc, char **argv) {
     // Set "simulation" table global
     lua_setglobal(L, "simulation");
 
-    if (luaL_dofile(L, config_file.c_str()) != LUA_OK) {
+    auto handleLuaError = [L]() {
         std::cerr << "Error loading Lua script: " << lua_tostring(L, -1)
                   << std::endl;
         lua_pop(L, 1);
         lua_close(L);
         return 1;
+    };
+
+    if (config_file == "") {
+        if (luaL_dostring(L, DEFAULT_SIMULATION) != LUA_OK) {
+            return handleLuaError();
+        }
+    } else if (luaL_dofile(L, config_file.c_str()) != LUA_OK) {
+        return handleLuaError();
     }
 
     // Get values from Lua script
@@ -87,6 +97,10 @@ int main(int argc, char **argv) {
     GET_SIM_FIELD(L, "screenHeight", screenHeight, lua_tointeger);
     GET_SIM_FIELD(L, "showDebugInfo", showDebugInfo, lua_toboolean);
     GET_SIM_FIELD(L, "particleCount", particleCount, lua_tointeger);
+    GET_SIM_FIELD(L, "threadsPerBlock", simulationThreadsPerBlock,
+                  lua_tointeger);
+    GET_SIM_FIELD(L, "rendererThreadsPerBlock", rendererThreadsPerBlock,
+                  lua_tointeger);
 
     // Vector configurations
     particles.resize(particleCount);
@@ -118,7 +132,8 @@ int main(int argc, char **argv) {
     // Initializing simulation
     ParticleSimulator simulator =
         ParticleSimulator(particles.data(), particleCount, gravity, maxSpeed,
-                          screenWidth, screenHeight, targetFPS, showDebugInfo);
+                          screenWidth, screenHeight, targetFPS, showDebugInfo,
+                          simulationThreadsPerBlock, rendererThreadsPerBlock);
     simulator.run();
 
     return 0;
