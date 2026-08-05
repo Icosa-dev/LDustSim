@@ -40,6 +40,6 @@ void launch_simulation_kernel(int threads_per_block,
  * @param max_speed Max speed of the particles for calculating color based
  * on velocity
  */
-void launch_render_particles_kernel(int threads, const Particle *particles,
+void launch_render_particles_kernel(int threads_per_block, const Particle *particles,
                                     int num_particles, Color *pixels, int width,
                                     int height, float max_speed);

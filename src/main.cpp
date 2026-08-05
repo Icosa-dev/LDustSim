@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#define VERISON "INDEV"
+#define VERSION "INDEV"
 
 #include <argparse/argparse.hpp>
 #include <iostream>
@@ -32,7 +32,7 @@ extern "C" {
 
 int main(int argc, char **argv) {
     // Argparsing
-    argparse::ArgumentParser program("LDustSim", VERISON);
+    argparse::ArgumentParser program("LDustSim", VERSION);
 
     program.add_argument("configuration-script")
         .help("Path to a .lua file to define the nature of the simulation")
@@ -91,15 +91,15 @@ int main(int argc, char **argv) {
 
     // Scalar configurations
     GET_SIM_FIELD(L, "gravity", gravity, lua_tonumber);
-    GET_SIM_FIELD(L, "maxSpeed", max_speed, lua_tonumber);
-    GET_SIM_FIELD(L, "targetFPS", target_fps, lua_tointeger);
-    GET_SIM_FIELD(L, "screenWidth", screen_width, lua_tointeger);
-    GET_SIM_FIELD(L, "screenHeight", screen_height, lua_tointeger);
-    GET_SIM_FIELD(L, "showDebugInfo", show_debug_info, lua_toboolean);
-    GET_SIM_FIELD(L, "particleCount", particle_count, lua_tointeger);
-    GET_SIM_FIELD(L, "threadsPerBlock", simulation_threads_per_block,
+    GET_SIM_FIELD(L, "max_speed", max_speed, lua_tonumber);
+    GET_SIM_FIELD(L, "target_fps", target_fps, lua_tointeger);
+    GET_SIM_FIELD(L, "screen_width", screen_width, lua_tointeger);
+    GET_SIM_FIELD(L, "screen_height", screen_height, lua_tointeger);
+    GET_SIM_FIELD(L, "show_debug_info", show_debug_info, lua_toboolean);
+    GET_SIM_FIELD(L, "particle_count", particle_count, lua_tointeger);
+    GET_SIM_FIELD(L, "threads_per_block", simulation_threads_per_block,
                   lua_tointeger);
-    GET_SIM_FIELD(L, "rendererThreadsPerBlock", renderer_threads_per_block,
+    GET_SIM_FIELD(L, "renderer_threads_per_block", renderer_threads_per_block,
                   lua_tointeger);
 
     // Vector configurations
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
     for (int i = 1; i <= particle_count; i++) {
         lua_rawgeti(L, -1, i);
 
-        Particle p = particles[i - 1];
+        Particle &p = particles[i - 1];
 
         if (lua_istable(L, -1)) {
             GET_PARTICLE_FIELD(L, "x", p.x, lua_tonumber);
@@ -118,8 +118,8 @@ int main(int argc, char **argv) {
             GET_PARTICLE_FIELD(L, "vx", p.vx, lua_tonumber);
             GET_PARTICLE_FIELD(L, "vy", p.vy, lua_tonumber);
             GET_PARTICLE_FIELD(L, "mass", p.mass, lua_tonumber);
-            GET_PARTICLE_FIELD(L, "isGravNode", p.is_grav_node, lua_tointeger);
-            GET_PARTICLE_FIELD(L, "isMoveable", p.is_moveable, lua_tointeger);
+            GET_PARTICLE_FIELD(L, "is_grav_node", p.is_grav_node, lua_tointeger);
+            GET_PARTICLE_FIELD(L, "is_moveable", p.is_moveable, lua_tointeger);
         }
 
         lua_pop(L, 1);
