@@ -13,61 +13,63 @@
 #include "particle.h"
 #include "particle_simulator.h"
 
-__global__ void simulationKernel(const Particle *currentParticles,
-                                 Particle *nextParticles, int numParticles,
-                                 float gravity, float deltaTime) {
+__global__ void simulation_kernel(const Particle *current_particles,
+                                  Particle *next_particles, int num_particles,
+                                  float gravity, float delta_time) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (index >= numParticles)
+    if (index >= num_particles)
         return;
 
-    Particle p = currentParticles[index];
+    Particle p = current_particles[index];
 
-    if (p.isMoveable == 0) {
-        nextParticles[index] = p;
+    if (p.is_moveable == 0) {
+        next_particles[index] = p;
         return;
     }
 
-    for (int i = 0; i < numParticles; i++) {
+    for (int i = 0; i < num_particles; i++) {
         if (i == index)
             continue;
 
-        Particle other = currentParticles[i];
+        Particle other = current_particles[i];
 
-        if (other.isGravNode == 1) {
+        if (other.is_grav_node == 1) {
             float dx = other.x - p.x;
             float dy = other.y - p.y;
 
-            float distanceSq = (dx * dx) + (dy * dy) + 0.1f;
-            float distance = sqrtf(distanceSq);
+            float distance_sq = (dx * dx) + (dy * dy) + 0.1f;
+            float distance = sqrtf(distance_sq);
 
-            float force = (other.mass * 10.0f) / distanceSq;
+            float force = (other.mass * 10.0f) / distance_sq;
 
-            p.vx += (dx / distance) * force * deltaTime;
-            p.vy += (dy / distance) * force * deltaTime;
+            p.vx += (dx / distance) * force * delta_time;
+            p.vy += (dy / distance) * force * delta_time;
         }
     }
 
-    p.x += p.vx * deltaTime;
-    p.y += p.vy * deltaTime;
+    p.x += p.vx * delta_time;
+    p.y += p.vy * delta_time;
 
-    nextParticles[index] = p;
+    next_particles[index] = p;
 }
 
-void launchSimulationKernel(int threadsPerBlock, const Particle *currentParticles, Particle *nextParticles,
-                            int numParticles, float gravity, float deltaTime) {
-    int blocksPerGrid = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
+void launch_simulation_kernel(int threads_per_block,
+                              const Particle *current_particles,
+                              Particle *next_particles, int num_particles,
+                              float gravity, float delta_time) {
+    int blocks_per_grid = (num_particles + threads_per_block - 1) / threads_per_block;
 
-    simulationKernel<<<blocksPerGrid, threadsPerBlock>>>(
-        currentParticles, nextParticles, numParticles, gravity, deltaTime);
+    simulation_kernel<<<blocks_per_grid, threads_per_block>>>(
+        current_particles, next_particles, num_particles, gravity, delta_time);
 }
 
-__global__ void renderParticlesKernel(const Particle *particles,
-                                      int numParticles, Color *pixels,
-                                      int width, int height, float maxSpeed) {
+__global__ void render_particles_kernel(const Particle *particles,
+                                      int num_particles, Color *pixels,
+                                      int width, int height, float max_speed) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (index >= numParticles)
+    if (index >= num_particles)
         return;
 
     Particle p = particles[index];
@@ -76,23 +78,23 @@ __global__ void renderParticlesKernel(const Particle *particles,
 
     if (x >= 0 && x < width && y >= 0 && y < height) {
         float speed = sqrtf(p.vx * p.vx + p.vy * p.vy);
-        float normalizedSpeed = fminf(fmaxf(speed / maxSpeed, 0.0f), 1.0f);
+        float normalized_speed = fminf(fmaxf(speed / max_speed, 0.0f), 1.0f);
 
         Color col = {
-            .r = static_cast<unsigned char>(normalizedSpeed * 255),
+            .r = static_cast<unsigned char>(normalized_speed * 255),
             .g = 0,
-            .b = static_cast<unsigned char>((1.0f - normalizedSpeed) * 255),
+            .b = static_cast<unsigned char>((1.0f - normalized_speed) * 255),
             .a = 255};
 
         pixels[y * width + x] = col;
     }
 }
 
-void launchRenderParticlesKernel(int threadsPerBlock, const Particle *particles, int numParticles,
-                                 Color *pixels, int width, int height,
-                                 float maxSpeed) {
-    int blocksPerGrid = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
+void launch_render_particles_kernel(int threads_per_block, const Particle *particles,
+                                 int num_particles, Color *pixels, int width,
+                                 int height, float max_speed) {
+    int blocks_per_grid = (num_particles + threads_per_block - 1) / threads_per_block;
 
-    renderParticlesKernel<<<blocksPerGrid, threadsPerBlock>>>(
-        particles, numParticles, pixels, width, height, maxSpeed);
+    render_particles_kernel<<<blocks_per_grid, threads_per_block>>>(
+        particles, num_particles, pixels, width, height, max_speed);
 }

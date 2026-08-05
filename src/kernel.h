@@ -14,29 +14,32 @@ struct Particle;
  * @brief Launch a kernel for gravitational simulation of particles on
  * the GPU
  *
- * @param threadsPerBlcok The number of threads per block that the kernel will use
- * @param currentParticles Particle buffer to base calculations on
- * @param nextParticles Output buffer for post-calculation particles
- * @param numParticles Number of particles
+ * @param threads_per_blcok The number of threads per block that the kernel will
+ * use
+ * @param current_particles Particle buffer to base calculations on
+ * @param next_particles Output buffer for post-calculation particles
+ * @param num_particles Number of particles
  * @param gravity Amount of gravity to simulate
- * @param deltaTime Delta time
+ * @param delta_time Delta time
  */
-void launchSimulationKernel(int threadsPerBlco , const Particle *currentParticles,
-                            Particle *nextParticles, int numParticles,
-                            float gravity, float deltaTime);
+void launch_simulation_kernel(int threads_per_block,
+                              const Particle *current_particles,
+                              Particle *next_particles, int num_particles,
+                              float gravity, float delta_time);
 
 /**
  * @brief  Launch a kernel for rendering of particles on the GPU
  *
- * @param threadsPerBlock The number of threads per block that the kernel will use
+ * @param threads_per_block The number of threads per block that the kernel will
+ * use
  * @param particles Particles to render
- * @param numParticles Number of particles
+ * @param num_particles Number of particles
  * @param pixels Pixel buffer to draw on
  * @param width Width of the pixel buffer
  * @param height Height of the pixel buffer
- * @param maxSpeed Max speed of the particles for calculating color based
+ * @param max_speed Max speed of the particles for calculating color based
  * on velocity
  */
-void launchRenderParticlesKernel(int threads, const Particle *particles,
-                                 int numParticles, Color *pixels, int width,
-                                 int height, float maxSpeed);
+void launch_render_particles_kernel(int threads, const Particle *particles,
+                                    int num_particles, Color *pixels, int width,
+                                    int height, float max_speed);

@@ -12,6 +12,6 @@ struct Particle {
     float x, y;
     float vx, vy;
     float mass;
-    uint8_t isGravNode; // 1 if influences other particles
-    uint8_t isMoveable;
+    uint8_t is_grav_node; // 1 if influences other particles
+    uint8_t is_moveable;
 };

@@ -50,10 +50,10 @@ int main(int argc, char **argv) {
     std::string config_file = program.get<std::string>("configuration-script");
 
     // Simulation config values
-    double gravity, maxSpeed;
-    int targetFPS, screenWidth, screenHeight, particleCount,
-        simulationThreadsPerBlock, rendererThreadsPerBlock;
-    bool showDebugInfo;
+    double gravity, max_speed;
+    int target_fps, screen_width, screen_height, particle_count,
+        simulation_threads_per_block, renderer_threads_per_block;
+    bool show_debug_info;
     std::vector<Particle> particles;
 
     // Lua init
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
     // Set "simulation" table global
     lua_setglobal(L, "simulation");
 
-    auto handleLuaError = [L]() {
+    auto handle_lua_error = [L]() {
         std::cerr << "Error loading Lua script: " << lua_tostring(L, -1)
                   << std::endl;
         lua_pop(L, 1);
@@ -80,10 +80,10 @@ int main(int argc, char **argv) {
 
     if (config_file == "") {
         if (luaL_dostring(L, DEFAULT_SIMULATION) != LUA_OK) {
-            return handleLuaError();
+            return handle_lua_error();
         }
     } else if (luaL_dofile(L, config_file.c_str()) != LUA_OK) {
-        return handleLuaError();
+        return handle_lua_error();
     }
 
     // Get values from Lua script
@@ -91,23 +91,23 @@ int main(int argc, char **argv) {
 
     // Scalar configurations
     GET_SIM_FIELD(L, "gravity", gravity, lua_tonumber);
-    GET_SIM_FIELD(L, "maxSpeed", maxSpeed, lua_tonumber);
-    GET_SIM_FIELD(L, "targetFPS", targetFPS, lua_tointeger);
-    GET_SIM_FIELD(L, "screenWidth", screenWidth, lua_tointeger);
-    GET_SIM_FIELD(L, "screenHeight", screenHeight, lua_tointeger);
-    GET_SIM_FIELD(L, "showDebugInfo", showDebugInfo, lua_toboolean);
-    GET_SIM_FIELD(L, "particleCount", particleCount, lua_tointeger);
-    GET_SIM_FIELD(L, "threadsPerBlock", simulationThreadsPerBlock,
+    GET_SIM_FIELD(L, "maxSpeed", max_speed, lua_tonumber);
+    GET_SIM_FIELD(L, "targetFPS", target_fps, lua_tointeger);
+    GET_SIM_FIELD(L, "screenWidth", screen_width, lua_tointeger);
+    GET_SIM_FIELD(L, "screenHeight", screen_height, lua_tointeger);
+    GET_SIM_FIELD(L, "showDebugInfo", show_debug_info, lua_toboolean);
+    GET_SIM_FIELD(L, "particleCount", particle_count, lua_tointeger);
+    GET_SIM_FIELD(L, "threadsPerBlock", simulation_threads_per_block,
                   lua_tointeger);
-    GET_SIM_FIELD(L, "rendererThreadsPerBlock", rendererThreadsPerBlock,
+    GET_SIM_FIELD(L, "rendererThreadsPerBlock", renderer_threads_per_block,
                   lua_tointeger);
 
     // Vector configurations
-    particles.resize(particleCount);
+    particles.resize(particle_count);
 
     lua_getfield(L, -1, "particles");
 
-    for (int i = 1; i <= particleCount; i++) {
+    for (int i = 1; i <= particle_count; i++) {
         lua_rawgeti(L, -1, i);
 
         Particle p = particles[i - 1];
@@ -118,8 +118,8 @@ int main(int argc, char **argv) {
             GET_PARTICLE_FIELD(L, "vx", p.vx, lua_tonumber);
             GET_PARTICLE_FIELD(L, "vy", p.vy, lua_tonumber);
             GET_PARTICLE_FIELD(L, "mass", p.mass, lua_tonumber);
-            GET_PARTICLE_FIELD(L, "isGravNode", p.isGravNode, lua_tointeger);
-            GET_PARTICLE_FIELD(L, "isMoveable", p.isMoveable, lua_tointeger);
+            GET_PARTICLE_FIELD(L, "isGravNode", p.is_grav_node, lua_tointeger);
+            GET_PARTICLE_FIELD(L, "isMoveable", p.is_moveable, lua_tointeger);
         }
 
         lua_pop(L, 1);
@@ -131,9 +131,9 @@ int main(int argc, char **argv) {
 
     // Initializing simulation
     ParticleSimulator simulator =
-        ParticleSimulator(particles.data(), particleCount, gravity, maxSpeed,
-                          screenWidth, screenHeight, targetFPS, showDebugInfo,
-                          simulationThreadsPerBlock, rendererThreadsPerBlock);
+        ParticleSimulator(particles.data(), particle_count, gravity, max_speed,
+                          screen_width, screen_height, target_fps, show_debug_info,
+                          simulation_threads_per_block, renderer_threads_per_block);
     simulator.run();
 
     return 0;

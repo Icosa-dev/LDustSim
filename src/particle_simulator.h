@@ -16,44 +16,48 @@ struct Particle;
 class ParticleSimulator {
 private:
     // Simulation buffers
-    Particle *_bufferA, *_bufferB;
+    Particle *buffer_a, *buffer_b;
 
     // Simulation variables
-    const int _particleCount;
-    const float _gravity;
-    float _timeElapsed = 0.0f;
-    const float _maxSpeed;
-    const int _simulationThreadsPerBlock;
+    const int particle_count;
+    const float gravity;
+    float time_elapsed = 0.0f;
+    const float max_speed;
+    const int simulation_threads_per_block;
 
     // Raylib variables
-    const int _screenWidth;
-    const int _screenHeight;
-    const int _targetFPS;
-    const bool _showDebugInfo;
+    const int screen_width;
+    const int screen_height;
+    const int target_fps;
+    const bool show_debug_info;
 
     // GPU rendering fields
-    Color *_cudaPixels = nullptr;
-    Texture2D _screenTexture;
-    const int _rendererThreadsPerBlock;
+    Color *cuda_pixels = nullptr;
+    Texture2D screen_texture;
+    const int renderer_threads_per_block;
 
 public:
     /**
      * @brief Construct a new Particle Simulator object
      *
      * @param particles Initial particle buffer
-     * @param particleCount Total number of particles
+     * @param particle_count Total number of particles
      * @param gravity Gravitational constant
-     * @param maxSpeed Max speed a particle can reach
-     * @param screenWidth Simulation screen width
-     * @param screenHeight Simulation screen height
-     * @param targetFPS Target FPS for the simulation
-     * @param showDebugInfo Simulation will display debug info if true
-     * @param simulationThreadsPerBlock Number of threads the simulation kernel will use
-     * @param rendererThreadsPerBlock Number of threads the renderer kernel will use
+     * @param max_speed Max speed a particle can reach
+     * @param screen_width Simulation screen width
+     * @param screen_height Simulation screen height
+     * @param target_fps Target FPS for the simulation
+     * @param show_debug_info Simulation will display debug info if true
+     * @param simulation_threads_per_block Number of threads the simulation kernel
+     * will use
+     * @param renderer_threads_per_block Number of threads the renderer kernel will
+     * use
      */
-    ParticleSimulator(Particle *particles, int particleCount, float gravity,
-                      float maxSpeed, int screenWidth, int screenHeight,
-                      int targetFPS, bool showDebugInfo, int simulationThreadsPerBlock, int rendererThreadsPerBlock);
+    ParticleSimulator(Particle *particles, int particle_count, float gravity,
+                      float max_speed, int screen_width, int screen_height,
+                      int target_fps, bool show_debug_info,
+                      int simulation_threads_per_block,
+                      int renderer_threads_per_block);
 
     /**
      * @brief Destroy the Particle Simulator object
