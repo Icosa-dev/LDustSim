@@ -10,8 +10,8 @@
 #include <driver_types.h>
 #include <raylib.h>
 
-#include "Particle.h"
-#include "ParticleSimulator.h"
+#include "particle.h"
+#include "particle_simulator.h"
 
 __global__ void simulationKernel(const Particle *currentParticles,
                                  Particle *nextParticles, int numParticles,

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "ParticleSimulator.h"
+#include "particle_simulator.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -13,8 +13,8 @@
 #include <raylib.h>
 #include <sstream>
 
-#include "Kernel.h"
-#include "Particle.h"
+#include "kernel.h"
+#include "particle.h"
 
 ParticleSimulator::ParticleSimulator(Particle *particles, int particleCount,
                                      float gravity, float maxSpeed,

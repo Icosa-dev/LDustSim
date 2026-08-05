@@ -33,9 +33,9 @@ set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
 
 add_executable(${PROJECT_NAME} 
-    src/Main.cpp
-    src/ParticleSimulator.cpp
-    src/Kernel.cu
+    src/main.cpp
+    src/particle_simulator.cpp
+    src/kernel.cu
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
